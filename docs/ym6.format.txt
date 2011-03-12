@@ -1,0 +1,84 @@
+YM6 File Format spec.
+
+News and rumours about StSound
+YM6 format spec.
+ 
+-------------------------------------------------------------------------------------------- 
+News and rumours about StSound
+--------------------------------------------------------------------------------------------
+
+If you're an StSound fanatic, you probably notice there is no regulary update. In fact, I (leonard) work on different projects these times.
+First of all, I work with James Boulton on a brillant ST Emulator called "SainT". We plane to release it for the STNICC 2000.
+Second, HTML and old StSound code takes me a lot of time, and I'm very lazy for that kind of work.
+And third (but not least !!!) I just crashed my soundblaster card !!! Unfortunatly I try an Ensoniq Soundscape but it does not work too. I think my ISA slot is dead... :-(
+
+So, don't worry about StSound: it is always alive, and I'm very happy (proud :-)) to see what's people do with YM (see the 8bits players, that's great !).
+
+The next StSound release will surely consist of a new Winamp plugin and some update on the StSound page. (You're too many registered users now, I have to update all your names !!)
+
+Other thing important ! I change my email adress so please write me at arnaud.carre@... now ! (StSound web page don't change: www.multimania.com/leonard )
+
+--------------------------------------------------------------------------------------------
+YM6 format spec.
+--------------------------------------------------------------------------------------------
+
+First of all, if you really want to make an YM file reader, you MUST read the first YmFormat.txt, convering all stuff you have to know before read YM6 format. You must be YM5 familiar because I'll use some words / expressions used in YmFormat.txt.
+
+Ok, let's assume you're an YM5 specialist now.
+
+Let's call data registers r0, r1, etc... YM6 is a 16 bytes per frame format, as YM5. The big change is that YM6 can play 1 or 2 special effects in a frame. (To play tunes with two sid voices for exemple).
+
+R1, bit 4-5: Special effect 1 voice (00: No special effect 1, 01: Effect 1 on voice A, 02: Voice B, 03: Voice C)
+R1, bit 6-7: Special effect type (00: SID voice, 01:Digidrum, 10:Sinus SID (TAO), 11: Sync Buzzer (TAO)
+
+For each effect, timer predivisor is stored in R6, bits 5-7, and timer count is stored in R14, bits 0-7. All that stuff is available for the second special effect, you just have to replace R1,R6,R14 by R3, R8 and R15).
+
+Let's now see these new special effects:
+
+--------------------------------------------------------------------------------------------
+SID Sound
+--------------------------------------------------------------------------------------------
+
+As YM5, SID is composed of a single value: VMAX. VMAX is contained in bits 0-3 of the volume registers of the voice effect. (Remember, voice effect is stored in R1 b4-5)
+
+--------------------------------------------------------------------------------------------
+Digidrum
+--------------------------------------------------------------------------------------------
+As YM5, Digidrum is composed of a sample number, wich is stored in bits 0-4 (5 bits lenght) of the volume voice register (R8,R9 or R10, it depends).
+
+--------------------------------------------------------------------------------------------
+Sinus-SID
+--------------------------------------------------------------------------------------------
+
+Sinus SID is a TAO specific trick to produce sinus waves. "Sinus SID" is not a great name for the effect, wich is just a looped sample. (But I use it in my first source code and I don't change it ! :-)). The sample is composed of 8 bytes of volume value. So you have to loop in these 8 bytes. I personally use that table:
+
+static void sinVolBuild(void)
+{
+	for (int vol=0;vol<16;vol++)
+	{
+		for (int pos=0;pos<8;pos++)
+		{
+			double a = (((double)pos)*2.0*PI)/8.0;
+			int amp = (int)(32767.0*sin(a)*SIDSINPOWER);
+			amp = (amp*vol)/16;
+			sinVolTab[vol*8+pos] = amp;
+		}
+	}
+}
+
+--------------------------------------------------------------------------------------------
+Sync Buzzer
+--------------------------------------------------------------------------------------------
+
+Again a TAO effect, wich is, to my opinion, one of the greatest effect in ATARI music world (just after the SID of course). In fact, it's very simple ! It's a SID technique on the volume shape. As you're an YM specialist now, you probably know that writing in YM2149 registers 13 set a new volume shape, but RESTART the shape ! So, by writing in R13 in a timer rout, you can modulate the shape frequency, producing some nice sound. (Try the new TAO tunes).
+SyncBuzzer uses only one data: the env shape used. It's stored in bits 0-3 (4 bits lenght) of the effect volume voice register (R8,R9 or R10).
+
+ 
+
+Ok I hope it will help all of you asking me some YM6 support, and have a nice day !
+
+Arnaud Carré, aka Leonard / OXYGENE
+
+arnaud.carre@...
+
+www.multimania.com/leonard
