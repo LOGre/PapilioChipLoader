@@ -1,0 +1,13 @@
+This tool is a patch on an old ASAP (0.2.1) version in order to convert any player based SAP file to register based SAP file.
+It means that the SAP file only contains a dump of the POKEY registers and not 6502 embedded player.
+
+Should compile on any linux.
+
+This patch was written by Don Mahurin (http://sap.openright.org) and modified by us.
+
+the script sapconvert.sh takes as argument one SAP file, convert it to the type R then compress it using LHA.
+(apt-get install lha if needed, you know that).
+
+have fun
+
+--shazz
