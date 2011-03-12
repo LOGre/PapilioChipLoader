@@ -119,13 +119,13 @@ public class JsscSerialLoader
             Loader loader = null;
             Header header;
 
-            if (ext.equalsIgnoreCase("SAP"))
+            if (ext.equalsIgnoreCase(Header.SAPFILEEXT))
             {
                 loader = new SAPLoader();
                 loader.depack(fileToDepack);
                 header = (SAPHeader) loader.decodeFileFormat();
             }
-            else if (ext.equalsIgnoreCase("YM"))
+            else if (ext.equalsIgnoreCase(Header.YMFILEEXT))
             {
                 loader = new YMLoader();
                 loader.depack(fileToDepack);
@@ -134,7 +134,7 @@ public class JsscSerialLoader
             }
             else
             {
-                throw new ProcessException("Format not managed : " + ext);
+                throw new ProcessException("Format not (yet ?) managed : " + ext);
             }
 
             header.dump();

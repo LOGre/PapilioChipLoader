@@ -53,9 +53,9 @@ public class SAPHeader extends Header
     private int fastplay;
 
     /* */
-    private String musicAddress;
-    private String initAddress;
-    private String playerAddress;
+    private String musicAddress = "0000";
+    private String initAddress = "0000";
+    private String playerAddress = "0000";
     
     // frames nb
     int frames;
@@ -134,11 +134,15 @@ public class SAPHeader extends Header
         System.out.println("NAME : " + getName());
         System.out.println("DATE : " + getDate());
         System.out.println("TYPE : " + getType());
+        System.out.println("FAST PLAY : " + getFastplay());
+        System.out.println("FRAMES : " + getFrames());
+        System.out.println("CHANNELS : " + getChannels());
         System.out.println("PLAYER : " + getPlayerAddress());
         System.out.println("INIT : " + getInitAddress());
+        System.out.println("MUSIC : " + getMusicAddress());
         System.out.println("DEF SONG : " + getDefaultSong());
-        System.out.println("FAST PLAY : " + getFastplay());
-        System.out.println("CHANNELS : " + getChannels());
+        System.out.println("SONGS : " + getSongs());
+
         System.out.println("--------------------------------------");
     }
 

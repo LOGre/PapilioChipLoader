@@ -356,8 +356,8 @@ public class YMLoader extends Loader
 
         if(loopSupport)
         {
-            //header.setLoopFrames(getMotoInt());
-            header.setLoopFrames(buffer.getInt());
+            header.setLoopFrames(getMotoInt());
+            //header.setLoopFrames(buffer.getInt());
         }
     }
 

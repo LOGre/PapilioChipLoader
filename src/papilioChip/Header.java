@@ -1,16 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Header abstract class
  */
 
 package papilioChip;
 
 /**
  *
- * @author admin
+ * @author shazz
  */
 public abstract class Header
 {
+    public final static String YMFILEEXT = "ym";
+    public final static String SAPFILEEXT = "sap";
+
     public abstract void dump();
 
     public abstract int getReplayRate();

@@ -82,7 +82,7 @@ public class YMHeader extends Header
         {
             minutes = Math.abs(getLoopFrames()/getReplayRate()/60);
             sec = Math.abs(getLoopFrames()/getReplayRate() - (minutes*60));
-            System.out.println("Loop after " + getLoopFrames() + " frames (" + minutes + " min " + sec + " sec)");
+            System.out.println("Loop restart at frame " + getLoopFrames() + " (" + minutes + " min " + sec + " sec)");
         }
         if(getFuturDataSize() != 0)
             System.out.println("Unused : " + getFuturDataSize());
