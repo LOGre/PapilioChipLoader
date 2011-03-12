@@ -2,10 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package papilioChip;
 
-
+import java.io.IOException;
 import papilioChip.ym.YMHeader;
 import java.util.Vector;
 import jssc.*;
@@ -13,14 +12,17 @@ import papilioChip.sap.SAPHeader;
 import papilioChip.sap.SAPLoader;
 import papilioChip.ym.YMLoader;
 
+import joptsimple.*;
+import static java.util.Arrays.*;
+
 /**
  *
  * @author admin
  */
 public class JsscSerialLoader
 {
-    private SerialPort serialPort;
 
+    private SerialPort serialPort;
 
     /**
      * Main class, startup
@@ -32,32 +34,50 @@ public class JsscSerialLoader
         String fileToDepack = "";
         String port = "";
         int uartFreq = 0;
+        boolean dumpFrames = false;
         //int tempo = 0;
 
-        if (args.length == 3)
+        try
         {
-            fileToDepack = args[0];
-            port = args[1];
-            try
+            OptionParser parser = new OptionParser()
             {
-                uartFreq = Integer.parseInt(args[2]);
-                if(uartFreq < 0) uartFreq = 9600;
 
-                //tempo = Integer.parseInt(args[3]);
-                //if(tempo < 0) tempo = 0;
-            }
-            catch (NumberFormatException e)
+
+                {
+                    acceptsAll(asList("f", "file"), "filename").withRequiredArg().ofType(String.class).describedAs("*.ym, *.sap");
+                    acceptsAll(asList("p", "port"), "port name").withRequiredArg().ofType(String.class).describedAs("serial port");
+                    acceptsAll(asList("b", "baudrate"), "define baudrate").withOptionalArg().ofType(Integer.class).describedAs("baudrate").defaultsTo(1000000);
+                    acceptsAll(asList("d", "dump"), "dump frames on screen");
+                    acceptsAll(asList("h", "?"), "show help");
+                }
+            };
+            OptionSet options = parser.parse(args);
+
+            if (options.has("?"))
             {
-                System.err.println("Argument frequency must be integer");
-                showUsage();
+                parser.printHelpOn(System.out);
                 System.exit(1);
             }
+            if (options.has("file"))
+            {
+                fileToDepack = (String) options.valueOf("file");
+            }
+            if (options.has("port"))
+            {
+                port = (String) options.valueOf("port");
+            }
+            if (options.has("baudrate"))
+            {
+                uartFreq = (Integer) options.valueOf("baudrate");
+            }
+            if (options.has("dump"))
+            {
+                dumpFrames = true;
+            }
         }
-        else
+        catch (IOException ex)
         {
-            System.err.println("Wrong number of arguments");
-            showUsage();
-            System.exit(1);
+            ex.printStackTrace();
         }
 
         // Arguments parsed, let's depack and stream the YM dump now
@@ -74,17 +94,17 @@ public class JsscSerialLoader
             // Depack and display header & dump on screen
             System.out.println("Depacking : " + fileToDepack);
 
-            String ext = fileToDepack.substring(fileToDepack.lastIndexOf('.')+1);
+            String ext = fileToDepack.substring(fileToDepack.lastIndexOf('.') + 1);
             Loader loader = null;
             Header header;
 
-            if(ext.equalsIgnoreCase("SAP"))
+            if (ext.equalsIgnoreCase("SAP"))
             {
                 loader = new SAPLoader();
                 loader.depack(fileToDepack);
                 header = (SAPHeader) loader.decodeFileFormat();
             }
-            else if(ext.equalsIgnoreCase("YM"))
+            else if (ext.equalsIgnoreCase("YM"))
             {
                 loader = new YMLoader();
                 loader.depack(fileToDepack);
@@ -97,7 +117,11 @@ public class JsscSerialLoader
             }
 
             header.dump();
-            loader.dumpFrames();
+            if (dumpFrames)
+            {
+                loader.dumpFrames();
+            }
+            
 
             // stream the data to the serial port
             //if(tempo > 0)
@@ -113,24 +137,16 @@ public class JsscSerialLoader
             //bye bye
             System.out.println("Done, exiting");
         }
-        catch(ProcessException ex)
+        catch (ProcessException ex)
         {
             System.err.println("FATAL : " + ex.getMessage());
             System.exit(1);
         }
-        catch(SerialProcessException ex)
+        catch (SerialProcessException ex)
         {
             System.err.println("FATAL : " + ex.getMessage());
             System.exit(1);
         }
-    }
-
-    private static void showUsage()
-    {
-        System.err.println("Usage : java -jar papilioChip.jar file port uart_speed");
-        System.err.println("file : YM or SAP file path");
-        System.err.println("port : Serial port (ex: COM3)");
-        System.err.println("uart_speed : UART baudrate");
     }
 
     /**
@@ -144,14 +160,14 @@ public class JsscSerialLoader
         //String jlp = props.getProperty("java.library.path");
         //props.setProperty("java.library.path", "/home/alain/tools/rxtx/rxtx-2.1-7-bins-r2/Linux/i686-unknown-linux-gnu");
         //System.setProperties(props);
-        System.out.println("Check available port");
+        System.out.println("Check available port(s) :");
         String[] portNames = SerialPortList.getPortNames();
-        for(int i = 0; i < portNames.length; i++){
-            System.out.println(portNames[i]);
+        for (int i = 0; i < portNames.length; i++)
+        {
+            System.out.println("[" + i + "] " + portNames[i]);
         }
 
     }
-
 
     /**
      * Disconnect the serial port
@@ -167,7 +183,7 @@ public class JsscSerialLoader
         catch (SerialPortException ex)
         {
             throw new SerialProcessException("Cannot close the serial port", ex);
-        }       
+        }
     }
 
     /**
@@ -178,11 +194,14 @@ public class JsscSerialLoader
      */
     public void stream(FramesBuffer buffer, Header header) throws SerialProcessException
     {
-        if(this.serialPort == null) throw new SerialProcessException("Serial Connection not set");
+        if (this.serialPort == null)
+        {
+            throw new SerialProcessException("Serial Connection not set");
+        }
 
         //SerialPortEmu serialPortEmu = new SerialPortEmu();    
         // delay to fit the YM dump frequency (usually 50Hz)
-        long delay = (long) ((1/(float) header.getReplayRate()*1000));
+        long delay = (long) ((1 / (float) header.getReplayRate() * 1000));
 
         System.out.println("Sending " + buffer.getRegistersNb() + " registers (total: " + buffer.getFramesNb() + " frames) every " + delay + " ms (" + header.getReplayRate() + " Hz)");
 
@@ -191,8 +210,8 @@ public class JsscSerialLoader
             long startTime, elapsedTime;
             byte[] regs;
 
-            Vector buf = buffer.getFramesData();           
-            for(int frames=0; frames<buffer.getFramesNb(); frames++)
+            Vector buf = buffer.getFramesData();
+            for (int frames = 0; frames < buffer.getFramesNb(); frames++)
             {
                 // send a full frame
                 startTime = System.nanoTime();
@@ -200,30 +219,35 @@ public class JsscSerialLoader
                 serialPort.writeBytes(regs);
                 elapsedTime = (System.nanoTime() - startTime) / 1000000;
 
-                if(delay - elapsedTime > 0)
-                    Thread.sleep( delay - elapsedTime );
+                if (delay - elapsedTime > 0)
+                {
+                    Thread.sleep(delay - elapsedTime);
+                }
                 //System.out.println("We had to wait " + (delay - elapsedTime) + " ms");
             }
             System.out.println("end before loop");
 
             // manage loop
-            if(header.getLoopFrames() > 0)
+            if (header.getLoopFrames() > 0)
             {
-                while(true)
+                while (true)
                 {
-                    for(int frames=header.getLoopFrames(); frames<buffer.getFramesNb(); frames++)
+                    for (int frames = header.getLoopFrames(); frames < buffer.getFramesNb(); frames++)
                     {
                         startTime = System.nanoTime();
                         regs = (byte[]) (buf.get(frames));
                         serialPort.writeBytes(regs);
                         elapsedTime = (System.nanoTime() - startTime) / 1000000;
-                        if(delay - elapsedTime > 0)
-                            Thread.sleep( delay - elapsedTime );
+                        if (delay - elapsedTime > 0)
+                        {
+                            Thread.sleep(delay - elapsedTime);
+                        }
                     }
                 }
             }
         }
-        catch (InterruptedException ex) {
+        catch (InterruptedException ex)
+        {
             throw new SerialProcessException(ex.getMessage(), ex);
         }
         catch (SerialPortException ex)
@@ -240,17 +264,17 @@ public class JsscSerialLoader
      * @throws SerialProcessException
      */
     public void connect(String portName, int uartFreq) throws SerialProcessException
-    {     
+    {
         try
         {
             serialPort = new SerialPort(portName);
             serialPort.openPort();
             serialPort.setParams(uartFreq,
-                                 SerialPort.DATABITS_8,
-                                 SerialPort.STOPBITS_1,
-                                 SerialPort.PARITY_NONE);
+                    SerialPort.DATABITS_8,
+                    SerialPort.STOPBITS_1,
+                    SerialPort.PARITY_NONE);
 
-            System.out.println("Connected to port " + portName + " at " + uartFreq + " bauds");
+            //System.out.println("Connected to port " + portName + " at " + uartFreq + " bauds");
 
         }
         catch (SerialPortException ex)
