@@ -298,7 +298,11 @@ int main(int argc, char *argv[])
 				ASAP_set_reg_output();
 
 				fprintf(fp,
-				"SAP\r\nTYPE R\r\nFASTPLAY %u\r\n%sFRAMES %s%u", ASAP_get_fastplay(), ASAP_get_stereo() ? "STEREO\r\n": "MONO\r\n", (1 + ASAP_get_stereo()) * 50 * seconds, 0xFFFF);
+				"SAP\r\nTYPE R\r\nFASTPLAY %u\r\n%s\r\nFRAMES %u%u", 
+				ASAP_get_fastplay(), 
+				ASAP_get_stereo() ? "STEREO\r\n": "MONO\r\n", 
+				(1 + ASAP_get_stereo()) * 50 * seconds, 
+				(unsigned int)0xFFFF);
 				n_bytes = (1 + ASAP_get_stereo()) * 9 * 50 * seconds;
 			}
 			while (n_bytes > 0 || ASAP_get_type() == 'R') {
