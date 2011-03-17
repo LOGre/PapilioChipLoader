@@ -10,7 +10,6 @@ package papilioChip;
 
 import papilioChip.ym.YMHeader;
 import papilioChip.ym.YMLoader;
-import papilioChip.ym.YMProcessException;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.PortInUseException;
