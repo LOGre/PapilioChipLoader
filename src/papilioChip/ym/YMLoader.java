@@ -6,15 +6,7 @@
  */
 package papilioChip.ym;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import net.sourceforge.lhadecompressor.LhaEntry;
 import net.sourceforge.lhadecompressor.LhaException;
-import net.sourceforge.lhadecompressor.LhaFile;
 import papilioChip.FramesBuffer;
 import papilioChip.Header;
 import papilioChip.Loader;
@@ -26,9 +18,6 @@ import papilioChip.ProcessException;
  */
 public class YMLoader extends Loader
 {
-
-    final private static int BUFFSER_SIZE = 4096;
-    private ByteBuffer buffer;
     private YMHeader header;
     private YMDigidrum[] digidrumsTable;
 
@@ -52,63 +41,23 @@ public class YMLoader extends Loader
         return header;
     }
 
-    /**
-     * Depack the YM file (LHA compression)
-     * @param filename
-     * @throws YMProcessException
-     */
     public void depack(String filename) throws ProcessException
     {
-        try 
-        {
-            // reset the stuff if called 2 times
-            alreadyDecoded = false;
-            buffer = null;
-            header = null;
-            digidrumsTable = null;
-            framesData = null;
-            
-            byte[] buff = new byte[BUFFSER_SIZE];
-            LhaFile lhafile = new LhaFile(filename);
-            LhaEntry entry = lhafile.getEntry(0);
-            System.out.println("    EXTRACT FILE    = " + entry.getFile());
-            System.out.println("    METHOD          = " + entry.getMethod());
-            System.out.println("    COMPRESSED SIZE = " + entry.getCompressedSize());
-            System.out.println("    ORIGINAL SIZE   = " + entry.getOriginalSize());
-            System.out.println("    TIME STAMP      = " + entry.getTimeStamp());
-            System.out.println("    OS ID           = " + (char) entry.getOS());
-            InputStream in = new BufferedInputStream(lhafile.getInputStream(entry), BUFFSER_SIZE);
-            ByteArrayOutputStream bastream = new ByteArrayOutputStream((int) entry.getOriginalSize());
-            int len = 0;
-            while (true) {
-                len = in.read(buff, 0, BUFFSER_SIZE);
-                if (len < 0) {
-                    break;
-                }
-                if (len < BUFFSER_SIZE) {
-                    bastream.write(buff, 0, len);
-                } else {
-                    bastream.write(buff);
-                }
-            }
-            bastream.flush();
-            buffer = ByteBuffer.wrap(bastream.toByteArray());
+        buffer = null;
+        header = null;
+        digidrumsTable = null;
+        alreadyDecoded = false;
+        framesData = null;
 
-            // WARNING: All DWORD or WORD are stored in MOTOROLA order in the file (INTEL reverse)
-            buffer.order(ByteOrder.BIG_ENDIAN);
-            
-            bastream.close();
-            lhafile.close();
-        }
-        catch (LhaException ex)
+        try
         {
-            throw new YMProcessException(ex);
+            depackLHA(filename);
         }
-        catch (IOException ex)
+        catch (ProcessException ex)
         {
-            throw new YMProcessException(ex);
+            System.out.println("Seems not to be a LHA packed file, trying raw");
+            loadFile(filename);
         }
-
     }
 
     /**

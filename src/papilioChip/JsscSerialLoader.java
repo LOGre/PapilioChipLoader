@@ -119,30 +119,14 @@ public class JsscSerialLoader
             Loader loader = null;
             Header header;
 
-            if (ext.equalsIgnoreCase(Header.SAPFILEEXT))
-            {
-                loader = new SAPLoader();
-                loader.depack(fileToDepack);
-                header = (SAPHeader) loader.decodeFileFormat();
-            }
-            else if (ext.equalsIgnoreCase(Header.YMFILEEXT))
-            {
-                loader = new YMLoader();
-                loader.depack(fileToDepack);
-                header = (YMHeader) loader.decodeFileFormat();
-                //loader.dumpDigiDrums();
-            }
-            else
-            {
-                throw new ProcessException("Format not (yet ?) managed : " + ext);
-            }
-
+            loader = Loader.getLoader(ext);
+            loader.depack(fileToDepack);
+            header = loader.decodeFileFormat();
             header.dump();
             if (dumpFrames)
             {
                 loader.dumpFrames();
             }
-
 
             // stream the data to the serial port
             //if(tempo > 0)

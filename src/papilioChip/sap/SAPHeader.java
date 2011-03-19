@@ -64,7 +64,7 @@ public class SAPHeader extends Header
     {
         if (!stringEOL.equals(STARTSTRING))
         {
-            throw new SAPProcessException("Wrong Start String");
+            throw new SAPProcessException("Not a valid SAP file (Wrong start string)");
         }
     }
 
@@ -118,7 +118,7 @@ public class SAPHeader extends Header
             }
             else
             {
-                System.out.println("Header not recognized : " + stringEOL);
+                System.out.println("Header not recognized => " + stringEOL);
             }
         }
         catch (NumberFormatException ex)

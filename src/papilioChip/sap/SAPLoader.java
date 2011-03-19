@@ -4,16 +4,9 @@
  */
 package papilioChip.sap;
 
-import papilioChip.Loader;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import net.sourceforge.lhadecompressor.LhaEntry;
+import papilioChip.Loader;
 import net.sourceforge.lhadecompressor.LhaException;
-import net.sourceforge.lhadecompressor.LhaFile;
 import papilioChip.FramesBuffer;
 import papilioChip.Header;
 import papilioChip.ProcessException;
@@ -24,9 +17,7 @@ import papilioChip.ProcessException;
  */
 public class SAPLoader extends Loader
 {
-
-    final private static int BUFFSER_SIZE = 4096;
-    private ByteBuffer buffer;
+    final protected static int LHA_BUFFSER_SIZE = 4096;
     private SAPHeader header;
     private byte[][] framesData;
     private boolean alreadyDecoded = false;
@@ -38,59 +29,22 @@ public class SAPLoader extends Loader
 
     public void depack(String filename) throws ProcessException
     {
+
+
+        // reset the stuff if called 2 times
+        alreadyDecoded = false;
+        buffer = null;
+        header = null;
+        framesData = null;
+        
         try
         {
-            // reset the stuff if called 2 times
-            alreadyDecoded = false;
-            buffer = null;
-            header = null;
-            framesData = null;
-
-            byte[] buff = new byte[BUFFSER_SIZE];
-            LhaFile lhafile = new LhaFile(filename);
-            LhaEntry entry = lhafile.getEntry(0);
-            System.out.println("    EXTRACT FILE    = " + entry.getFile());
-            System.out.println("    METHOD          = " + entry.getMethod());
-            System.out.println("    COMPRESSED SIZE = " + entry.getCompressedSize());
-            System.out.println("    ORIGINAL SIZE   = " + entry.getOriginalSize());
-            System.out.println("    TIME STAMP      = " + entry.getTimeStamp());
-            System.out.println("    OS ID           = " + (char) entry.getOS());
-
-            InputStream in = new BufferedInputStream(lhafile.getInputStream(entry), BUFFSER_SIZE);
-            ByteArrayOutputStream bastream = new ByteArrayOutputStream((int) entry.getOriginalSize());
-            int len = 0;
-            while (true)
-            {
-                len = in.read(buff, 0, BUFFSER_SIZE);
-                if (len < 0)
-                {
-                    break;
-                }
-                if (len < BUFFSER_SIZE)
-                {
-                    bastream.write(buff, 0, len);
-                }
-                else
-                {
-                    bastream.write(buff);
-                }
-            }
-            bastream.flush();
-            buffer = ByteBuffer.wrap(bastream.toByteArray());
-
-            // WARNING: All DWORD or WORD are stored in MOTOROLA order in the file (INTEL reverse)
-            buffer.order(ByteOrder.BIG_ENDIAN);
-
-            bastream.close();
-            lhafile.close();
+            depackLHA(filename);
         }
-        catch (LhaException ex)
+        catch (ProcessException ex)
         {
-            throw new SAPProcessException(ex);
-        }
-        catch (IOException ex)
-        {
-            throw new SAPProcessException(ex);
+            System.out.println("Seems not to be a LHA packed file, trying raw");
+            loadFile(filename);
         }
     }
 
@@ -129,31 +83,6 @@ public class SAPLoader extends Loader
             checkType(header.getType());
 
             // decode registers
-
-            /*
-
-            AUDF1
-            AUDC1
-            AUDF2
-            AUDC2
-            AUDF3
-            AUDC3
-            AUDF4
-            AUDC4
-            AUDCTL
-
-            for(p = 0; p < 1 + sap_stereo; p++)
-            {
-            for(i = 0; i < 4; i++)
-            {
-            ((unsigned char *)buffer)[ret++] = AUDF[p*4+i];
-            ((unsigned char *)buffer)[ret++] = AUDC[p*4+i];
-            }
-            ((unsigned char *)buffer)[ret++] = AUDCTL[p];
-            }
-            buffer_len -= (9 << sap_stereo);
-             */
-
             int nbFrames = header.getFrames();
             if(nbFrames == 0 ) nbFrames = (buffer.capacity() - framesStart) / 9;
             header.setFrames(nbFrames);
@@ -169,9 +98,12 @@ public class SAPLoader extends Loader
 
             alreadyDecoded = true;
         }
-        catch (Exception ex)
+        catch (SAPNoMoreMetadataException ex)
         {
-            ex.printStackTrace();
+            throw new SAPProcessException("Error while parsing the file : " + ex.getMessage(), ex);
+        }
+        catch (SAPProcessException ex)
+        {
             throw new SAPProcessException("Error while parsing the file : " + ex.getMessage(), ex);
         }
 
@@ -252,4 +184,6 @@ public class SAPLoader extends Loader
         }
 
     }
+
+
 }
