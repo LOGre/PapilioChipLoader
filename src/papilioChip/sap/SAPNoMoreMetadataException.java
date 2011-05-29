@@ -1,13 +1,12 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Special Exception class for SAP header parsing
  */
 
 package papilioChip.sap;
 
 /**
  *
- * @author admin
+ * @author shazz
  */
 public class SAPNoMoreMetadataException extends Exception
 {

@@ -7,7 +7,7 @@
 package papilioChip.ym;
 
 import net.sourceforge.lhadecompressor.LhaException;
-import papilioChip.FramesBuffer;
+import papilioChip.FramesBuffer8;
 import papilioChip.Header;
 import papilioChip.Loader;
 import papilioChip.ProcessException;
@@ -51,9 +51,15 @@ public class YMLoader extends Loader
 
         try
         {
+            //loadFile(filename);
             depackLHA(filename);
         }
         catch (ProcessException ex)
+        {
+            System.out.println("Seems not to be a LHA packed file, trying raw");
+            loadFile(filename);
+        }
+        catch(IllegalArgumentException ex)
         {
             System.out.println("Seems not to be a LHA packed file, trying raw");
             loadFile(filename);
@@ -356,11 +362,11 @@ public class YMLoader extends Loader
 
     /**
      * Retrieve the frames
-     * @return a FramesBuffer
+     * @return a FramesBuffer8
      */
-    public FramesBuffer getFramesBuffer()
+    public FramesBuffer8 getFramesBuffer()
     {
-        return new FramesBuffer(framesData, header.getFrames(), 16);
+        return new FramesBuffer8(framesData, header.getFrames(), 16);
     }
 
     /**

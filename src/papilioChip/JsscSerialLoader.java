@@ -5,12 +5,8 @@
 package papilioChip;
 
 import java.io.IOException;
-import papilioChip.ym.YMHeader;
 import java.util.Vector;
 import jssc.*;
-import papilioChip.sap.SAPHeader;
-import papilioChip.sap.SAPLoader;
-import papilioChip.ym.YMLoader;
 
 import joptsimple.*;
 import static java.util.Arrays.*;
@@ -127,6 +123,8 @@ public class JsscSerialLoader
             {
                 loader.dumpFrames();
             }
+            FramesBuffer buffer = loader.getFramesBuffer();
+            //buffer.dumpToFile(50*30);
 
             // stream the data to the serial port
             //if(tempo > 0)
@@ -165,7 +163,7 @@ public class JsscSerialLoader
         //String jlp = props.getProperty("java.library.path");
         //props.setProperty("java.library.path", "/home/alain/tools/rxtx/rxtx-2.1-7-bins-r2/Linux/i686-unknown-linux-gnu");
         //System.setProperties(props);
-        System.out.println("Check available port(s) :");
+        System.out.println(".Check available serial port(s) :");
         String[] portNames = SerialPortList.getPortNames();
 
         for (int i = 0; i < portNames.length; i++)
@@ -230,12 +228,17 @@ public class JsscSerialLoader
             {
                 // send a full frame
                 startTime = System.nanoTime();
-                regs = (byte[]) (buf.get(frames));
+
+                if(buffer.getFrameSize() == 8)
+                    regs = (byte[]) (buf.get(frames));
+                else
+                {
+                    regs = convertToByteArray( (int[]) buf.get(frames));
+                }
                 serialPort.writeBytes(regs);
+
                 elapsedTime = (System.nanoTime() - startTime) / 1000000;
-
                 sleeptime = delay - elapsedTime;
-
                 if (sleeptime > 0)
                 {
                     Thread.sleep(sleeptime);
@@ -298,5 +301,18 @@ public class JsscSerialLoader
         {
             throw new SerialProcessException(ex.getMessage(), ex);
         }
+    }
+
+    private byte[] convertToByteArray(int[] tab)
+    {
+        byte[] res = new byte[tab.length*2];
+        for(int i=0; i<tab.length; i++)
+        {
+            int val = tab[i];
+            res[2*i]        = (byte)( (val >> 8) & 0xFF);
+            res[(2*i)+1]    = (byte)(val & 0xFF);
+        }
+
+        return res;
     }
 }

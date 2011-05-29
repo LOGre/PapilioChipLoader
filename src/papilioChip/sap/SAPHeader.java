@@ -1,6 +1,5 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * SAP Header class
  */
 package papilioChip.sap;
 
@@ -8,29 +7,83 @@ import papilioChip.Header;
 
 /**
  *
- * @author admin
+ * @author shazz
  */
 public class SAPHeader extends Header
 {
 
+    /**
+     *
+     */
     public final static String STARTSTRING = "SAP";
+    /**
+     *
+     */
     public final static String AUTHOR = "AUTHOR";
+    /**
+     *
+     */
     public final static String NAME = "NAME";
+    /**
+     *
+     */
     public final static String DATE = "DATE";
+    /**
+     *
+     */
     public final static String PLAYER = "PLAYER";
+    /**
+     *
+     */
     public final static String MUSIC = "MUSIC";
+    /**
+     *
+     */
     public final static String INIT = "INIT";
+    /**
+     *
+     */
     public final static String SONGS = "SONGS";
+    /**
+     *
+     */
     public final static String FASTPLAY = "FASTPLAY";
+    /**
+     *
+     */
     public final static String DEFSONG = "DEFSONG";
+    /**
+     *
+     */
     public final static String TYPE = "TYPE";
+    /**
+     *
+     */
     public final static String STEREO = "STEREO";
+    /**
+     *
+     */
     public final static String FRAMES = "FRAMES";
 
+    /**
+     *
+     */
     public final static  char TYPE_R = 'R';
+    /**
+     *
+     */
     public final static  char TYPE_C = 'C';
+    /**
+     *
+     */
     public final static  char TYPE_B = 'B';
+    /**
+     *
+     */
     public final static  char TYPE_S = 'S';
+    /**
+     *
+     */
     public final static  char TYPE_D = 'D';
     
     /** Music author's name. */
@@ -60,6 +113,11 @@ public class SAPHeader extends Header
     // frames nb
     int frames;
 
+    /**
+     *
+     * @param stringEOL
+     * @throws SAPProcessException
+     */
     public void checkStartString(String stringEOL) throws SAPProcessException
     {
         if (!stringEOL.equals(STARTSTRING))
@@ -68,6 +126,11 @@ public class SAPHeader extends Header
         }
     }
 
+    /**
+     *
+     * @param stringEOL
+     * @throws SAPProcessException
+     */
     public void parseMetadata(String stringEOL) throws SAPProcessException
     {
         try
@@ -127,9 +190,12 @@ public class SAPHeader extends Header
         }
     }
 
+    /**
+     *
+     */
     public void dump()
     {
-        System.out.println("--------------------------------------");
+        System.out.println("---------------------------------------");
         System.out.println("AUTHOR: " + getAuthor());
         System.out.println("NAME : " + getName());
         System.out.println("DATE : " + getDate());
@@ -143,129 +209,229 @@ public class SAPHeader extends Header
         System.out.println("DEF SONG : " + getDefaultSong());
         System.out.println("SONGS : " + getSongs());
 
-        System.out.println("--------------------------------------");
+        System.out.println("---------------------------------------");
     }
 
+    /**
+     *
+     * @return
+     */
     public String getAuthor()
     {
         return author;
     }
 
+    /**
+     *
+     * @param author
+     */
     public void setAuthor(String author)
     {
         this.author = author;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getChannels()
     {
         return channels;
     }
 
+    /**
+     *
+     * @param channels
+     */
     public void setChannels(int channels)
     {
         this.channels = channels;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getDate()
     {
         return date;
     }
 
+    /**
+     *
+     * @param date
+     */
     public void setDate(String date)
     {
         this.date = date;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getDefaultSong()
     {
         return defaultSong;
     }
 
+    /**
+     *
+     * @param defaultSong
+     */
     public void setDefaultSong(int defaultSong)
     {
         this.defaultSong = defaultSong;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getFastplay()
     {
         return fastplay;
     }
 
+    /**
+     *
+     * @param fastplay
+     */
     public void setFastplay(int fastplay)
     {
         this.fastplay = fastplay;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getInitAddress()
     {
         return initAddress;
     }
 
+    /**
+     *
+     * @param initAddress
+     */
     public void setInitAddress(String initAddress)
     {
         this.initAddress = initAddress;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getMusicAddress()
     {
         return musicAddress;
     }
 
+    /**
+     *
+     * @param musicAddress
+     */
     public void setMusicAddress(String musicAddress)
     {
         this.musicAddress = musicAddress;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     *
+     * @param name
+     */
     public void setName(String name)
     {
         this.name = name;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getPlayerAddress()
     {
         return playerAddress;
     }
 
+    /**
+     *
+     * @param playerAddress
+     */
     public void setPlayerAddress(String playerAddress)
     {
         this.playerAddress = playerAddress;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSongs()
     {
         return songs;
     }
 
+    /**
+     *
+     * @param songs
+     */
     public void setSongs(int songs)
     {
         this.songs = songs;
     }
 
+    /**
+     *
+     * @return
+     */
     public char getType()
     {
         return type;
     }
 
+    /**
+     *
+     * @param type
+     */
     public void setType(char type)
     {
         this.type = type;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getFrames()
     {
         return frames;
     }
 
+    /**
+     *
+     * @param frames
+     */
     public void setFrames(int frames)
     {
         this.frames = frames;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int getReplayRate()
     {
@@ -273,6 +439,10 @@ public class SAPHeader extends Header
         return rate;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int getLoopFrames()
     {

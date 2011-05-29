@@ -1,8 +1,8 @@
 /*
- * SAP Processing exception class
+ * VGM Processing exception class
  */
 
-package papilioChip.sap;
+package papilioChip.vgm;
 
 import papilioChip.ProcessException;
 
@@ -10,13 +10,13 @@ import papilioChip.ProcessException;
  *
  * @author shazz
  */
-public class SAPProcessException extends ProcessException
+public class VGMProcessException extends ProcessException
 {
     /**
      *
      * @param thrwbl
      */
-    public SAPProcessException(Throwable thrwbl)
+    public VGMProcessException(Throwable thrwbl)
     {
         super( thrwbl );
     }
@@ -25,7 +25,7 @@ public class SAPProcessException extends ProcessException
      *
      * @param string
      */
-    public SAPProcessException(String string)
+    public VGMProcessException(String string)
     {
         super( string );
     }
@@ -35,7 +35,7 @@ public class SAPProcessException extends ProcessException
      * @param string
      * @param thrwbl
      */
-    public SAPProcessException(String string, Throwable thrwbl)
+    public VGMProcessException(String string, Throwable thrwbl)
     {
         super( string, thrwbl );
     }

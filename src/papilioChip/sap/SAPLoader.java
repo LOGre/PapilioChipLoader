@@ -1,27 +1,26 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * SAP loader class
  */
 package papilioChip.sap;
 
-import java.io.IOException;
 import papilioChip.Loader;
-import net.sourceforge.lhadecompressor.LhaException;
-import papilioChip.FramesBuffer;
+import papilioChip.FramesBuffer8;
 import papilioChip.Header;
 import papilioChip.ProcessException;
 
 /**
  *
- * @author admin
+ * @author shazz
  */
 public class SAPLoader extends Loader
 {
-    final protected static int LHA_BUFFSER_SIZE = 4096;
     private SAPHeader header;
     private byte[][] framesData;
     private boolean alreadyDecoded = false;
 
+    /**
+     * Constructor
+     */
     public SAPLoader()
     {
         super();
@@ -134,11 +133,11 @@ public class SAPLoader extends Loader
 
     /**
      * Retrieve the frames
-     * @return a FramesBuffer
+     * @return a FramesBuffer8
      */
-    public FramesBuffer getFramesBuffer()
+    public FramesBuffer8 getFramesBuffer()
     {
-        return new FramesBuffer(framesData, header.getFrames(), 9);
+        return new FramesBuffer8(framesData, header.getFrames(), 9);
     }
     
     /**
