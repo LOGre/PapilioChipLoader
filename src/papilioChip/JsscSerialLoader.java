@@ -105,7 +105,7 @@ public class JsscSerialLoader
 
             // connect the port at the good frequency
             System.out.println("Connect serial port : " + port + " at " + uartFreq + " bauds");
-            serialLoader.connect(port, uartFreq);
+            //serialLoader.connect(port, uartFreq);
 
             // Depack and display header & dump on screen
             System.out.println("Depacking : " + fileToDepack);
@@ -117,6 +117,7 @@ public class JsscSerialLoader
             loader = Loader.getLoader(ext);
             loader.depack(fileToDepack);
             header = loader.decodeFileFormat();
+            System.out.println("Header :");
             header.dump();
             if (dumpFrames)
             {
@@ -134,7 +135,7 @@ public class JsscSerialLoader
 
             // disconnect the port
             System.out.println("Stream ended, disconnecting...");
-            serialLoader.disconnect();
+            //serialLoader.disconnect();
 
             //bye bye
             System.out.println("Done, exiting");
