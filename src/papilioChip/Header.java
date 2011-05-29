@@ -12,6 +12,7 @@ public abstract class Header
 {
     public final static String YMFILEEXT = "ym";
     public final static String SAPFILEEXT = "sap";
+    public final static String VGMFILEEXT = "vgm";
 
     public abstract void dump();
 
