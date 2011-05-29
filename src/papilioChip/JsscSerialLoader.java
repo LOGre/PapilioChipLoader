@@ -1,5 +1,5 @@
 /*
- * Main program using jssc serial lib
+ * Main program using jssc serial library
  */
 package papilioChip;
 
