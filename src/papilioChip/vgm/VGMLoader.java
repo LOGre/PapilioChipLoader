@@ -122,6 +122,7 @@ public class VGMLoader extends Loader
                 boolean frameEnded = false;
                 VGMFramePacket packets = new VGMFramePacket();
                 int nbPackets = 0;
+                int framesToSkipped = 1;
 
                 while(!frameEnded & !dataEnded)
                 {
@@ -138,13 +139,20 @@ public class VGMLoader extends Loader
                             buffer.position(buffer.position() + 2);
                             break;
                         case VGM_CMD_ENDFRAME:
+                            framesToSkipped = 1;
                             frameEnded = true;
                             break;
                         case VGM_CMD_ENDATA:
+                            framesToSkipped = 1;
                             dataEnded = true;
                             break;
                         case VGM_CMD_BLANKFRAMES:
-                            buffer.position(buffer.position() + 2);
+                            byte nbF1 = buffer.get();
+                            byte nbF2 = buffer.get();
+                            framesToSkipped = (((nbF2 & 0xFF) << 8) | (nbF1 & 0xFF))/735 ;
+                            //buffer.position(buffer.position() + 2);
+                            System.out.println("Skip : " + framesToSkipped + " frames");
+                            frameEnded = true;
                             break;
                         default:
                             System.out.println("Command not managed : " + Integer.toHexString(command) + " at pos 0x0" + Integer.toHexString(buffer.position() - 3));
@@ -152,8 +160,17 @@ public class VGMLoader extends Loader
                      }
                 }
                 // copy data
-                paquetVect.add(packets);
-                nbFrames++;
+                if(framesToSkipped > 1)
+                {
+                for(int l=0; l<framesToSkipped; l++)
+                    paquetVect.add(new VGMFramePacket());
+                }
+                else
+                {
+                    paquetVect.add(packets);
+                }
+                nbFrames = nbFrames + framesToSkipped;
+
                 System.out.println("Frame " + nbFrames + " parsed with " + nbPackets + " packets");
             }
 

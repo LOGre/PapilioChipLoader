@@ -72,7 +72,7 @@ public class FramesBuffer8 implements FramesBuffer
 
         }
 
-        String strFilePath = "D://temp//dump3.out";
+        String strFilePath = "D://temp//tb303f.log";
         try
         {
             FileOutputStream fos = new FileOutputStream(strFilePath);

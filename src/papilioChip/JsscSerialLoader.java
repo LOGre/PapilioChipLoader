@@ -105,7 +105,7 @@ public class JsscSerialLoader
 
             // connect the port at the good frequency
             System.out.println("Connect serial port : " + port + " at " + uartFreq + " bauds");
-            //serialLoader.connect(port, uartFreq);
+            serialLoader.connect(port, uartFreq);
 
             // Depack and display header & dump on screen
             System.out.println("Depacking : " + fileToDepack);
@@ -135,7 +135,7 @@ public class JsscSerialLoader
 
             // disconnect the port
             System.out.println("Stream ended, disconnecting...");
-            //serialLoader.disconnect();
+            serialLoader.disconnect();
 
             //bye bye
             System.out.println("Done, exiting");
@@ -203,7 +203,7 @@ public class JsscSerialLoader
             throw new SerialProcessException("Serial Connection not set");
         }
 
-        //SerialPortEmu serialPortEmu = new SerialPortEmu();    
+        //SerialPortEmu serialPortEmu = new SerialPortEmu();
         // delay to fit the YM dump frequency (usually 50Hz)
         long delay = 0;
         if (fixedDelay == 0)

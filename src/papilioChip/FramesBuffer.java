@@ -28,4 +28,6 @@ interface FramesBuffer {
     public int getRegistersNb();
 
     public int getFrameSize();
+
+    public void dumpToFile(int nbFrames);
 }
